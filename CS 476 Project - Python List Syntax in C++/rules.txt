@@ -1,0 +1,26 @@
+Rule 1:
+a : python_cplusplus_array<T>   i : int
+---------------------------------------
+a[i] : T
+
+Rule 2:
+e1 ⇓ {v1,v2,...,vn}   e2 ⇓ i  (if i < 0 then i + size = i2 else i2 = i) (v = v_i2) (i > -n && i < n)
+----------------------------------------------------------------------------------------------------
+e1[e2] ⇓ v
+
+Rule 3:
+a : python_cplusplus_array<T>  s : int  e : int
+-----------------------------------------------
+a[s:e] : python_cplusplus_array<T>
+
+Rule 4:
+e1 ⇓ {v1,v2,...,vn}  e2 ⇓ S  e3 ⇓ E (if E < S && S < 0 && E < 0 then S=n+S E=n+E sub_arr = {vE,...,vS} else sub_arr = {vS,...,vE})  (((E > S && S >= 0 && E > 0) && (S < n) && (E < n)) || (E < S && S < 0 && E < 0) && (S > -n) && (E > -n))
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+e1[e2:e3] ⇓ sub_arr
+
+For Rule 4 it is super complicated because the user of the array can really mess up the range operator if they don't use it correctly.
+That's why we have checks for everything making sure that both indices will actually return a legit range of values. 
+For having both negative indices it is meant for the sub array being returned to be specifically backwards and both positive indices to return the subarray going forwards. 
+In the code we restrict it 2 cases and anything else just has the range operator return null. 
+some edge cases would be if one index was positive and other negative and the other way around as well. 
+Also if the user doesn't properly have the end be the end and the start be the start it will also mess up the ranges so that's why we decided to do everything within just 2 very specific cases.
